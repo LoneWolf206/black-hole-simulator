@@ -27,3 +27,11 @@ class Vector2D:
     
     def distance_to(self, other):
         return (self - other).magnitude()
+
+    def __iadd__(self, other):
+     self.x += other.x
+     self.y += other.y
+     return self
+    
+    def __repr__(self):
+      return f"Vector2D({self.x:.2f}, {self.y:.2f})"

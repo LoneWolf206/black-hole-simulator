@@ -1,32 +1,30 @@
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 from body import Body
 from vector import Vector2D
+from physics import gravitational_force
 
-b1=Body(100, Vector2D(0, 0), Vector2D(0, 0))
-b2=Body(100, Vector2D(100, 0), Vector2D(0, 0))
+earth = Body(5.97e24, Vector2D(0, 0), Vector2D(0, 0))
+moon = Body(7.34e22, Vector2D(3.84e8, 0), Vector2D(0, 1022))
 
-def gravitational_force(b1, b2):
-    G = 1000
-    direction = (b2.position - b1.position).normalize()
-    distance = b1.position.distance_to(b2.position)
-    F = G * b1.mass * b2.mass / distance**2
-    force = direction * F
-    return force
+DT = 3600
+positions = []
 
-force = gravitational_force(b1, b2)
-b1.apply_force(force)
-b2.apply_force(force* -1)
+for i in range(720):  # 30 days
+    F = gravitational_force(earth, moon)
+    earth.apply_force(F)
+    moon.apply_force(F * -1)
+    earth.update(DT)
+    moon.update(DT)
+    positions.append((moon.position.x, moon.position.y))
 
-for i in range (100):
-     direction = (b2.position - b1.position).normalize()
+xs = [p[0] for p in positions]
+ys = [p[1] for p in positions]
 
-     distance = b1.position.distance_to(b2.position)
-
-     F = G * b1.mass * b2.mass / distance**2
-
-     force = direction * F
-
-     b1.apply_force(force)
-     b2.apply_force(force * -1)
-
-     b1.update(0.1)
-     b2.update(0.1)
+plt.figure(figsize=(6,6))
+plt.plot(xs, ys)
+plt.plot(0, 0, 'yo', markersize=15, label='Earth')
+plt.title('Moon orbit (30 days)')
+plt.axis('equal')
+plt.savefig('orbit.png')
+print("Saved orbit.png")
